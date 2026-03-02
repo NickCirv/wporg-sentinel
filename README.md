@@ -95,7 +95,7 @@ The WP.org review queue typically takes 10-14 days. This tool will wake you up t
 3. Pass both as `--telegram TOKEN:CHAT_ID`
 
 ```bash
-node index.js --slug my-plugin --telegram 6661234567:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw:123456789
+node index.js --slug my-plugin --telegram YOUR_BOT_TOKEN:123456789
 ```
 
 The notification will look like:
