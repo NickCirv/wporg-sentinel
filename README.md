@@ -1,3 +1,5 @@
+![Banner](banner.svg)
+
 # wporg-sentinel 🛡️
 
 Stop refreshing WP.org like a maniac.
