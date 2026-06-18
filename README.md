@@ -1,117 +1,19 @@
-![Banner](banner.svg)
+![wporg-sentinel — stop refreshing WP.org, get notified the instant your plugin is approved](assets/banner.png)
 
-# wporg-sentinel 🛡️
+<div align="center">
 
-Stop refreshing WP.org like a maniac.
+**Stop refreshing WP.org. Get an instant notification the moment your plugin goes live.**
 
-You submitted your plugin. Now you're checking the review queue every 20 minutes at 2am.
-Stop. This does it for you.
+![license](https://img.shields.io/badge/license-MIT-blue?labelColor=0B0A09)
+![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen?labelColor=0B0A09)
+![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen?labelColor=0B0A09)
+![channels](https://img.shields.io/badge/notifications-desktop%20%2B%20Telegram-34D399?labelColor=0B0A09)
 
-![Node.js >=18](https://img.shields.io/badge/node-%3E%3D18-green)
-![License: MIT](https://img.shields.io/badge/license-MIT-blue)
-![Zero dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)
-
----
-
-## What it does
-
-- Polls the WP.org Plugin Info API on a configurable interval
-- Exponential backoff — starts at your interval, doubles each attempt, caps at 60 minutes
-- Live countdown timer in terminal (same line, no scroll spam)
-- Running history table of every check attempt
-- Desktop notification the moment your plugin goes live (macOS + Linux)
-- Optional Telegram notification so you get pinged wherever you are
-- Big ASCII celebration on approval
-- Graceful exit (Ctrl+C) with session summary
+</div>
 
 ---
 
-## Install
-
-### Run directly with npx (no install needed)
-
-```bash
-npx wporg-sentinel --slug your-plugin-slug
-```
-
-### Or clone and run with node
-
-```bash
-git clone https://github.com/NickCirv/wporg-sentinel
-cd wporg-sentinel
-node index.js --slug your-plugin-slug
-```
-
-No dependencies. Pure Node.js ES modules. Works with Node >=18.
-
----
-
-## Usage
-
-```
-node index.js --slug <plugin-slug> [options]
-
-Options:
-  --slug <slug>              Plugin slug to watch (required)
-  --interval <minutes>       Initial poll interval in minutes (default: 15)
-  --telegram <token:chatId>  Telegram bot token and chat ID for notifications
-  --help, -h                 Show help
-```
-
-### Examples
-
-```bash
-# Watch a plugin, check every 15 minutes (default)
-node index.js --slug my-awesome-plugin
-
-# Check every 10 minutes initially
-node index.js --slug my-awesome-plugin --interval 10
-
-# With Telegram notifications
-node index.js --slug my-awesome-plugin --telegram 123456789:AABBabcd_TOKEN:987654321
-
-# Using npx
-npx wporg-sentinel --slug my-awesome-plugin --interval 20
-```
-
----
-
-## How it works
-
-1. Hits `https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=YOUR_SLUG`
-2. If the response has a `slug` field → your plugin is **LIVE**
-3. If the response has an `error` field → not yet approved, wait and retry
-4. **Exponential backoff**: interval doubles after each check, caps at 60 minutes
-   - Default: 15min → 30min → 60min → 60min → ...
-   - With `--interval 5`: 5min → 10min → 20min → 40min → 60min → ...
-5. On approval: desktop notification + Telegram (if configured) + ASCII party
-
-The WP.org review queue typically takes 10-14 days. This tool will wake you up the moment it's done — not when you happen to refresh.
-
----
-
-## Telegram Setup
-
-1. Message [@BotFather](https://t.me/BotFather) on Telegram, create a bot, copy the token
-2. Get your chat ID by messaging [@userinfobot](https://t.me/userinfobot)
-3. Pass both as `--telegram TOKEN:CHAT_ID`
-
-```bash
-node index.js --slug my-plugin --telegram YOUR_BOT_TOKEN:123456789
-```
-
-The notification will look like:
-```
-🛡️ wporg-sentinel
-
-✅ My Awesome Plugin is now LIVE on WordPress.org!
-
-https://wordpress.org/plugins/my-awesome-plugin/
-```
-
----
-
-## Terminal output
+The WP.org review queue takes 10–14 days. Most developers end up checking the queue manually every 20 minutes, at all hours. `wporg-sentinel` polls the Plugin Info API on your behalf — with exponential backoff, a live countdown timer, and instant desktop + Telegram notifications the moment your plugin is approved.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -129,6 +31,7 @@ https://wordpress.org/plugins/my-awesome-plugin/
 ```
 
 On approval:
+
 ```
 ╔══════════════════════════════════════════════════════════╗
 ║  🎉  PLUGIN APPROVED!  🎉                                ║
@@ -140,18 +43,86 @@ On approval:
   URL:      https://wordpress.org/plugins/my-awesome-plugin/
 ```
 
+## Install
+
+No npm account needed — runs straight from GitHub with zero dependencies:
+
+```bash
+npx github:NickCirv/wporg-sentinel --slug your-plugin-slug
+```
+
+Or clone and run locally:
+
+```bash
+git clone https://github.com/NickCirv/wporg-sentinel
+cd wporg-sentinel
+node index.js --slug your-plugin-slug
+```
+
+## Usage
+
+```bash
+npx github:NickCirv/wporg-sentinel --slug <plugin-slug> [options]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--slug <slug>` | Plugin slug to watch — required |
+| `--interval <minutes>` | Initial poll interval in minutes (default: `15`) |
+| `--telegram <token:chatId>` | Telegram bot token and chat ID for mobile notifications |
+| `--help`, `-h` | Show help |
+
+### Examples
+
+```bash
+# Watch a plugin with default 15-minute interval
+npx github:NickCirv/wporg-sentinel --slug my-awesome-plugin
+
+# Check every 10 minutes initially
+npx github:NickCirv/wporg-sentinel --slug my-awesome-plugin --interval 10
+
+# With Telegram notifications
+npx github:NickCirv/wporg-sentinel --slug my-awesome-plugin --telegram YOUR_BOT_TOKEN:123456789
+```
+
+## How it works
+
+1. Hits `https://api.wordpress.org/plugins/info/1.2/` with your plugin slug
+2. `slug` field present in response → plugin is **LIVE** → fires all notifications
+3. `error` field present → not yet approved → waits and retries
+4. **Exponential backoff**: interval doubles after each check, caps at 60 minutes
+   - Default: `15m → 30m → 60m → 60m → …`
+   - With `--interval 5`: `5m → 10m → 20m → 40m → 60m → …`
+5. On approval: desktop notification + Telegram message (if configured) + ASCII celebration screen
+
+## Telegram setup
+
+1. Message [@BotFather](https://t.me/BotFather), create a bot, copy the token
+2. Get your chat ID from [@userinfobot](https://t.me/userinfobot)
+3. Pass both as `--telegram TOKEN:CHAT_ID`
+
+```bash
+npx github:NickCirv/wporg-sentinel --slug my-plugin --telegram YOUR_BOT_TOKEN:123456789
+```
+
+The notification message:
+
+```
+🛡️ wporg-sentinel
+
+✅ My Awesome Plugin is now LIVE on WordPress.org!
+
+https://wordpress.org/plugins/my-awesome-plugin/
+```
+
+## What it is NOT
+
+- **Not a plugin submission tool.** It monitors an already-submitted plugin — the submission itself still goes through the WP.org review portal.
+- **Not a guarantee of coverage.** Approval detection relies entirely on the Plugin Info API returning a `slug` field. If the API is down or slow, checks will time out gracefully and retry.
+- **Not a background service.** It runs in your terminal for as long as you leave it open. Use a multiplexer like `tmux` or `screen` if you need it to persist across terminal sessions.
+
 ---
 
-## Why not just a cron job?
-
-You could set up a cron job. But then you'd need to write the script, handle the API response parsing, wire up notifications, manage the backoff, and debug why it's not working at 3am.
-
-This is that script. Ready to run.
-
----
-
-## License
-
-MIT — use it, fork it, ship it.
-
-Built by [NickCirv](https://github.com/NickCirv). Born from the pain of waiting for WP.org approvals.
+<div align="center">
+<sub>Zero dependencies · Node 18+ · MIT · by <a href="https://github.com/NickCirv">NickCirv</a></sub>
+</div>
