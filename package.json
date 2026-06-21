@@ -4,7 +4,10 @@
   "description": "Stop refreshing WP.org. Get notified the moment your plugin gets approved.",
   "type": "module",
   "bin": { "wporg-sentinel": "./index.js" },
+  "scripts": {
+    "test": "node --test"
+  },
   "keywords": ["wordpress", "wporg", "plugin", "monitor", "approval"],
   "license": "MIT",
-  "engines": { "node": ">=18" }
+  "engines": { "node": ">=20" }
 }
